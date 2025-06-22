@@ -1,0 +1,141 @@
+"use client";
+
+import { useLanguage } from '@/contexts/language-context';
+import { Header } from '@/components/header';
+import { MobileNav } from '@/components/nav/mobile-nav';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState } from 'react';
+import { CalendarIcon } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
+
+export default function CreateGroup() {
+  const { t } = useLanguage();
+  const router = useRouter();
+  const [date, setDate] = useState<Date | undefined>(new Date());
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Normally, we'd save the group data here
+    // For demo purposes, redirect to dashboard
+    router.push('/dashboard');
+  };
+
+  const handleBack = () => {
+    router.back();
+  };
+
+  return (
+    <div className="min-h-screen">
+      <Header title={t('group.create.title')} showBackButton onBack={handleBack} />
+      <main className="container max-w-md mx-auto px-4 pb-20 pt-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('group.create.title')}</CardTitle>
+            <CardDescription>
+              Set up your Ikimina group and invite members
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">{t('group.create.name')}</Label>
+                <Input id="name" placeholder="e.g., Family Savings Group" required />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="amount">{t('group.create.amount')}</Label>
+                <Input 
+                  id="amount" 
+                  placeholder="5,000" 
+                  type="number" 
+                  min={1000} 
+                  step={500} 
+                  required 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="frequency">{t('group.create.frequency')}</Label>
+                <Select defaultValue="weekly">
+                  <SelectTrigger id="frequency">
+                    <SelectValue placeholder="Select frequency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="biweekly">Bi-weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="members">{t('group.create.members')}</Label>
+                <Input 
+                  id="members" 
+                  placeholder="5" 
+                  type="number" 
+                  min={3} 
+                  max={20} 
+                  required 
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="payment">{t('group.create.payment')}</Label>
+                <Select defaultValue="random">
+                  <SelectTrigger id="payment">
+                    <SelectValue placeholder="Select order" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="random">Random Draw</SelectItem>
+                    <SelectItem value="fixed">Fixed Order</SelectItem>
+                    <SelectItem value="need">By Need</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>{t('group.create.start')}</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !date && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {date ? format(date, "PPP") : <span>Pick a date</span>}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={date}
+                      onSelect={setDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button type="submit" className="w-full">{t('group.create.submit')}</Button>
+            </CardFooter>
+          </form>
+        </Card>
+      </main>
+      <MobileNav />
+    </div>
+  );
+}
