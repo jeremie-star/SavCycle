@@ -16,8 +16,8 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center pattern-hills bg-background text-foreground">
-      <div className="bg-card text-card-foreground p-8 rounded-2xl shadow-md border border-border w-full max-w-md hover-card">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 bg-background pattern-hills text-foreground">
+      <div className="bg-card text-card-foreground w-full max-w-md p-6 sm:p-8 rounded-2xl shadow-md border border-border hover-card">
         <h2 className="text-2xl font-bold text-center mb-6 gradient-text">
           Welcome to Ikimina
         </h2>
