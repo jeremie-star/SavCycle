@@ -3,7 +3,7 @@
 import { useLanguage } from '@/contexts/language-context';
 import { LanguageToggle } from '@/components/language-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
-// import Image from 'next/image';
+import AuthButton from '@/components/AuthButton'; 
 
 interface HeaderProps {
   title?: string;
@@ -64,6 +64,7 @@ export function Header({ title, showBackButton = false, onBack }: HeaderProps) {
       <div className="flex items-center gap-2">
         <LanguageToggle />
         <ThemeToggle />
+        <AuthButton /> {/* Auth button added here */}
       </div>
     </header>
   );
