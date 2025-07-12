@@ -3,7 +3,7 @@ const router = express.Router();
 const userModel = require("../models/userModel");
 const auth = require("../middleware/firebaseAuth");
 
-router.post("/", auth, async (req, res) => {
+router.post("/", auth ,async (req, res) => {
   try {
     await userModel.createUser({ id: req.user.uid, ...req.body });
     res.status(201).json({ message: "User created" });

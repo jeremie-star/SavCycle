@@ -14,4 +14,4 @@ app.use("/api/payouts", require("./routes/payoutRoutes"));
 app.use("/api/transactions", require("./routes/transactionRoutes"));
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, ()=> console.log(`Server initiating on port ${PORT}`))
+app.listen(PORT, ()=> console.log(`Server initiating on port ${PORT}`));
