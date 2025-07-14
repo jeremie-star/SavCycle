@@ -2,3 +2,4 @@
 node_modukes
 .DS_Store
 npm-debug.log
+.firebase-service-account.json

@@ -70,4 +70,17 @@ module.exports = {
   deleteGroup: async (id) => {
     await pool.query("DELETE FROM groups WHERE id = $1", [id]);
   },
+
+  getGroupMemberCount: async (group_id) => {
+  const result = await pool.query(
+    `SELECT COUNT(*) FROM group_members WHERE group_id = $1`, 
+    [group_id]
+  );
+  return parseInt(result.rows[0].count, 10);
+},
+
+  getGroupByCode: async (code) => {
+  const result = await pool.query("SELECT * FROM groups WHERE group_code = $1", [code]);
+  return result.rows[0];
+}
 };
