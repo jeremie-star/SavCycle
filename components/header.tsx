@@ -1,5 +1,6 @@
 "use client";
 
+import React from 'react';
 import { useLanguage } from '@/contexts/language-context';
 import { LanguageToggle } from '@/components/language-toggle';
 import { ThemeToggle } from '@/components/theme-toggle';
