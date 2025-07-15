@@ -4,6 +4,49 @@ const groupModel = require("../models/groupModel");
 const auth = require("../middleware/firebaseAuth");
 const pool = require("../config/db"); 
 
+/**
+ * @swagger
+ * tags:
+ *   name: Groups
+ *   description: Group management
+ */
+
+/**
+ * @swagger
+ * /api/groups:
+ *   post:
+ *     summary: Create a new group
+ *     tags: [Groups]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - description
+ *               - cycle_start_date
+ *               - cycle_end_date
+ *               - created_by
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               cycle_start_date:
+ *                 type: string
+ *                 format: date
+ *               cycle_end_date:
+ *                 type: string
+ *                 format: date
+ *               created_by:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Group created
+ */
+
 // Create a new group
 router.post("/", auth, async (req, res) => {
   try {
@@ -48,6 +91,17 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/groups:
+ *   get:
+ *     summary: Retrieve all groups
+ *     tags: [Groups]
+ *     responses:
+ *       200:
+ *         description: A list of groups
+ */
+
 // Get all groups
 router.get("/", async (_, res) => {
   try {
@@ -58,6 +112,24 @@ router.get("/", async (_, res) => {
     res.status(500).json({ error: "Failed to fetch groups" });
   }
 });
+
+/**
+ * @swagger
+ * /api/groups/{id}:
+ *   get:
+ *     summary: Retrieve a group by ID
+ *     tags: [Groups]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Group ID
+ *     responses:
+ *       200:
+ *         description: Group details
+ */
 
 // Get a single group by ID
 router.get("/:id", async (req, res) => {
@@ -71,6 +143,41 @@ router.get("/:id", async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/groups/{id}:
+ *   put:
+ *     summary: Update a group by ID
+ *     tags: [Groups]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Group ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               cycle_start_date:
+ *                 type: string
+ *                 format: date
+ *               cycle_end_date:
+ *                 type: string
+ *                 format: date
+ *     responses:
+ *       200:
+ *         description: Group updated
+ */
+
 // Update a group by ID
 router.put("/:id", async (req, res) => {
   try {
@@ -82,6 +189,24 @@ router.put("/:id", async (req, res) => {
     res.status(500).json({ error: "Failed to update group" });
   }
 });
+
+/**
+ * @swagger
+ * /api/groups/{id}:
+ *   delete:
+ *     summary: Delete a group by ID
+ *     tags: [Groups]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Group ID
+ *     responses:
+ *       200:
+ *         description: Group deleted
+ */
 
 // Delete a group by ID
 router.delete("/:id", async (req, res) => {

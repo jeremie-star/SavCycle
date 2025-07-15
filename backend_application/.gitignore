@@ -2,5 +2,5 @@
 node_modules
 .DS_Store
 npm-debug.log
-.node_modules
+node_modules
 .firebase-service-account.json
