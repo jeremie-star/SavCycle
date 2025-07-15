@@ -12,15 +12,105 @@ import { AreaChart, Calendar, CheckCircle, Clock, Users } from 'lucide-react';
 import Link from 'next/link';
 import { GroupContributionChart } from '@/components/dashboard/contribution-chart';
 import { PaymentHistory } from '@/components/dashboard/payment-history';
+import React, { useState, useEffect } from 'react';
 
 export default function Dashboard() {
   const { t } = useLanguage();
+
+  // Demo group members (replace with real data as needed)
+  const groupMembers = [
+    { name: 'You', status: 'paid', isYou: true },
+    { name: 'Claudine', status: 'paid' },
+    { name: 'Jean', status: 'pending' },
+    { name: 'Marie', status: 'paid' },
+    { name: 'Pascal', status: 'pending' },
+    { name: 'Diane', status: 'paid' },
+  ];
+
+  // Payout order logic
+  const [payoutOrderType, setPayoutOrderType] = useState<'random' | 'fixed' | 'need'>('random');
+  const [fixedQueue, setFixedQueue] = useState(groupMembers.map(m => m.name));
+  const [randomQueue, setRandomQueue] = useState<string[]>([]);
+  const [needPerson, setNeedPerson] = useState<string | null>(null);
+
+  // Shuffle helper
+  function shuffle(array: string[]) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  // Update random queue when needed
+  useEffect(() => {
+    if (payoutOrderType === 'random') {
+      setRandomQueue(shuffle(groupMembers.map(m => m.name)));
+    }
+  }, [payoutOrderType]);
 
   return (
     <div className="min-h-screen">
       <Header title={t('dashboard.title')} />
       <main className="container max-w-md mx-auto px-4 pb-20 pt-6">
         <div className="space-y-6">
+          {/* Payout Order Type Switcher */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Payout Order</CardTitle>
+              <CardDescription>
+                Choose how the payout order is determined for this group.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex gap-2 mb-4">
+                <Button variant={payoutOrderType === 'random' ? 'default' : 'outline'} onClick={() => setPayoutOrderType('random')}>Random Draw</Button>
+                <Button variant={payoutOrderType === 'fixed' ? 'default' : 'outline'} onClick={() => setPayoutOrderType('fixed')}>Fixed</Button>
+                <Button variant={payoutOrderType === 'need' ? 'default' : 'outline'} onClick={() => setPayoutOrderType('need')}>By Need</Button>
+              </div>
+              {/* Show queue/order based on type */}
+              {payoutOrderType === 'random' && (
+                <div>
+                  <p className="mb-2 text-sm text-muted-foreground">Randomly generated payout queue:</p>
+                  <ol className="list-decimal ml-4">
+                    {randomQueue.map((name, idx) => (
+                      <li key={idx}>{name}</li>
+                    ))}
+                  </ol>
+                  <Button size="sm" className="mt-2" onClick={() => setRandomQueue(shuffle(groupMembers.map(m => m.name)))}>Reshuffle</Button>
+                </div>
+              )}
+              {payoutOrderType === 'fixed' && (
+                <div>
+                  <p className="mb-2 text-sm text-muted-foreground">Fixed payout queue:</p>
+                  <ol className="list-decimal ml-4">
+                    {fixedQueue.map((name, idx) => (
+                      <li key={idx}>{name}</li>
+                    ))}
+                  </ol>
+                  {/* In a real app, allow drag-and-drop or editing order here */}
+                </div>
+              )}
+              {payoutOrderType === 'need' && (
+                <div>
+                  <p className="mb-2 text-sm text-muted-foreground">Select the member who needs the payout this round:</p>
+                  <select
+                    className="border rounded px-2 py-1"
+                    value={needPerson || ''}
+                    onChange={e => setNeedPerson(e.target.value)}
+                  >
+                    <option value="" disabled>Select member</option>
+                    {groupMembers.map((m, idx) => (
+                      <option key={idx} value={m.name}>{m.name}</option>
+                    ))}
+                  </select>
+                  {needPerson && <div className="mt-2">Selected: <b>{needPerson}</b></div>}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Group Info Card */}
           <Card>
             <CardHeader className="pb-2">

@@ -19,25 +19,48 @@ export default function Payment() {
   const router = useRouter();
   const { toast } = useToast();
   const [paymentMethod, setPaymentMethod] = useState('mobile-money');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [cardDetails, setCardDetails] = useState({
+    number: '',
+    name: '',
+    expiry: '',
+    cvv: ''
+  });
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Show confirmation dialog
+    // Validate based on payment method
+    if (paymentMethod === 'mobile-money' && !phoneNumber) {
+      toast({
+        title: "Error",
+        description: "Please enter your phone number",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (paymentMethod === 'card' && (!cardDetails.number || !cardDetails.name || !cardDetails.expiry || !cardDetails.cvv)) {
+      toast({
+        title: "Error",
+        description: "Please fill all card details",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setShowConfirmation(true);
   };
 
   const handleConfirm = () => {
     setShowConfirmation(false);
     
-    // Simulate processing
     toast({
       title: "Processing payment...",
       description: "Please wait while we process your contribution."
     });
     
-    // Show success after 2 seconds
     setTimeout(() => {
       setShowSuccess(true);
     }, 2000);
@@ -50,6 +73,14 @@ export default function Payment() {
 
   const handleBack = () => {
     router.back();
+  };
+
+  const handleCardInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setCardDetails(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   return (
@@ -85,7 +116,11 @@ export default function Payment() {
               
               <div className="space-y-3">
                 <Label>{t('payment.method')}</Label>
-                <RadioGroup defaultValue="mobile-money" onValueChange={setPaymentMethod}>
+                <RadioGroup 
+                  defaultValue="mobile-money" 
+                  value={paymentMethod}
+                  onValueChange={setPaymentMethod}
+                >
                   <div className="flex items-center space-x-2 border rounded-md p-3">
                     <RadioGroupItem value="mobile-money" id="mobile-money" />
                     <Label htmlFor="mobile-money" className="flex items-center cursor-pointer">
@@ -96,16 +131,83 @@ export default function Payment() {
                       </div>
                     </Label>
                   </div>
+                  
+                  {/* Mobile Money Phone Number Input */}
+                  {paymentMethod === 'mobile-money' && (
+                    <div className="space-y-2 pl-10">
+                      <Label htmlFor="phone">Phone Number</Label>
+                      <Input
+                        id="phone"
+                        type="tel"
+                        placeholder="+250 xxx xxx xxxx"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
+                      />
+                    </div>
+                  )}
+                  
                   <div className="flex items-center space-x-2 border rounded-md p-3">
-                    <RadioGroupItem value="card" id="card" disabled />
+                    <RadioGroupItem value="card" id="card" />
                     <Label htmlFor="card" className="flex items-center cursor-pointer">
-                      <CreditCard className="h-5 w-5 mr-2 text-muted-foreground" />
-                      <div>
-                        <p className="font-medium text-muted-foreground">Credit/Debit Card</p>
-                        <p className="text-xs text-muted-foreground">Coming soon</p>
+                      <CreditCard className="h-5 w-5 mr-2 text-secondary" />
+                      <div className="space-y-1">
+                        <p className="font-medium">Credit/Debit Card</p>
+                        <p className="text-xs text-muted-foreground">Pay with your card</p>
                       </div>
                     </Label>
                   </div>
+                  
+                  {/* Card Details Input */}
+                  {paymentMethod === 'card' && (
+                    <div className="space-y-3 pl-10">
+                      <div className="space-y-2">
+                        <Label htmlFor="card-number">Card Number</Label>
+                        <Input
+                          id="card-number"
+                          name="number"
+                          type="text"
+                          placeholder="xxxx xxxx xxxx xxxx"
+                          value={cardDetails.number}
+                          onChange={handleCardInputChange}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="card-name">Cardholder Name</Label>
+                        <Input
+                          id="card-name"
+                          name="name"
+                          type="text"
+                          placeholder="name on card"
+                          value={cardDetails.name}
+                          onChange={handleCardInputChange}
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="card-expiry">Expiry Date</Label>
+                          <Input
+                            id="card-expiry"
+                            name="expiry"
+                            type="text"
+                            placeholder="MM/YY"
+                            value={cardDetails.expiry}
+                            onChange={handleCardInputChange}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="card-cvv">CVV</Label>
+                          <Input
+                            id="card-cvv"
+                            name="cvv"
+                            type="text"
+                            placeholder="123"
+                            value={cardDetails.cvv}
+                            onChange={handleCardInputChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </RadioGroup>
               </div>
 
@@ -121,7 +223,6 @@ export default function Payment() {
               <Button 
                 type="submit" 
                 className="w-full"
-                disabled={paymentMethod !== 'mobile-money'}
               >
                 {t('payment.submit')}
               </Button>
@@ -147,8 +248,16 @@ export default function Payment() {
             </div>
             <div className="flex justify-between">
               <span className="text-sm">Payment Method:</span>
-              <span className="font-medium">MTN Mobile Money</span>
+              <span className="font-medium">
+                {paymentMethod === 'mobile-money' ? 'MTN Mobile Money' : 'Credit/Debit Card'}
+              </span>
             </div>
+            {paymentMethod === 'mobile-money' && (
+              <div className="flex justify-between">
+                <span className="text-sm">Phone Number:</span>
+                <span className="font-medium">{phoneNumber}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-sm">Transaction Fee:</span>
               <span className="font-medium">0 RWF</span>
