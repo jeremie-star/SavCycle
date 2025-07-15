@@ -1,5 +1,6 @@
 .env
-node_modukes
+node_modules
 .DS_Store
 npm-debug.log
+.node_modules
 .firebase-service-account.json
