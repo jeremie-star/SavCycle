@@ -9,3 +9,9 @@ A RESTful API built with **Node.js**, **Express**, **PostgreSQL**, and **Firebas
 - PostgreSQL database integration with connection pooling
 - Secure API endpoints protected by Firebase authentication middleware
 - Modular project structure for scalability and maintainability
+
+## Swagger
+
+`
+http://localhost:3001/api-docs
+`
