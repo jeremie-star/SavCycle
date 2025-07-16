@@ -11,6 +11,7 @@ app.get("/", (req, res) => {
 });
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+app.use("/api/auth", require("./auth/authRoutes"));
 app.use("/api/users", require("./routes/userRoutes"));
 app.use("/api/groups", require("./routes/groupRoutes"));
 app.use("/api/members", require("./routes/groupMemberRoutes"));
