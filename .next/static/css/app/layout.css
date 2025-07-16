@@ -588,6 +588,9 @@ video {
 .left-2 {
   left: 0.5rem;
 }
+.left-4 {
+  left: 1rem;
+}
 .left-\[50\%\] {
   left: 50%;
 }
@@ -626,9 +629,6 @@ video {
 }
 .top-full {
   top: 100%;
-}
-.left-4 {
-  left: 1rem;
 }
 .z-10 {
   z-index: 10;
@@ -697,6 +697,9 @@ video {
 }
 .ml-1 {
   margin-left: 0.25rem;
+}
+.ml-4 {
+  margin-left: 1rem;
 }
 .ml-auto {
   margin-left: auto;
@@ -1044,6 +1047,9 @@ video {
      -moz-user-select: none;
           user-select: none;
 }
+.list-decimal {
+  list-style-type: decimal;
+}
 .list-none {
   list-style-type: none;
 }
@@ -1160,6 +1166,9 @@ video {
 }
 .break-words {
   overflow-wrap: break-word;
+}
+.rounded {
+  border-radius: 0.25rem;
 }
 .rounded-2xl {
   border-radius: 1rem;
@@ -1452,6 +1461,9 @@ video {
 }
 .pb-4 {
   padding-bottom: 1rem;
+}
+.pl-10 {
+  padding-left: 2.5rem;
 }
 .pl-16 {
   padding-left: 4rem;
@@ -2869,9 +2881,9 @@ video {
 .\[\&_tr\]\:border-b tr {
   border-bottom-width: 1px;
 }
-/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[2].use[1]!./node_modules/next/dist/build/webpack/loaders/next-font-loader/index.js??ruleSet[1].rules[13].oneOf[2].use[2]!./node_modules/next/font/google/target.css?{"path":"app\\layout.tsx","import":"Inter","arguments":[{"subsets":["latin"]}],"variableName":"inter"} ***!
-  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[2].use[1]!./node_modules/next/dist/build/webpack/loaders/next-font-loader/index.js??ruleSet[1].rules[13].oneOf[2].use[2]!./node_modules/next/font/google/target.css?{"path":"app/layout.tsx","import":"Inter","arguments":[{"subsets":["latin"]}],"variableName":"inter"} ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /* cyrillic-ext */
 @font-face {
   font-family: 'Inter';
