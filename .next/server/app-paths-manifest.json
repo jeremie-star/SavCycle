@@ -1,9 +1,6 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/auth/page": "app/auth/page.js",
-  "/join-group/page": "app/join-group/page.js",
-  "/payment/page": "app/payment/page.js",
-  "/auth/signup/page": "app/auth/signup/page.js",
-  "/create-group/page": "app/create-group/page.js",
   "/page": "app/page.js",
   "/dashboard/page": "app/dashboard/page.js"
 }

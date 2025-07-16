@@ -6,6 +6,52 @@ const auth = require("../middleware/firebaseAuth");
 const allowedPaymentMethods = ["mobile-money", "card"];
 const allowedStatuses = ["completed", "incomplete", "pending"];
 
+/**
+ * @swagger
+ * tags:
+ *   name: Contributions
+ *   description: Contribution management routes
+ */
+
+/**
+ * @swagger
+ * /api/contributions:
+ *   post:
+ *     summary: Create a new contribution
+ *     tags: [Contributions]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - user_id
+ *               - group_id
+ *               - amount
+ *               - contribution_date
+ *               - payment_method
+ *               - status
+ *             properties:
+ *               user_id:
+ *                 type: string
+ *               group_id:
+ *                 type: string
+ *               amount:
+ *                 type: number
+ *               contribution_date:
+ *                 type: string
+ *                 format: date
+ *               payment_method:
+ *                 type: string
+ *               status:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: Contribution created
+ */
+
+
 // Create a new contribution
 router.post("/", auth, async (req, res) => {
   try {
@@ -49,6 +95,17 @@ router.post("/", auth, async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/contributions:
+ *   get:
+ *     summary: Retrieve all contributions
+ *     tags: [Contributions]
+ *     responses:
+ *       200:
+ *         description: A list of contributions
+ */
+
 // Get all contributions
 router.get("/", async (_, res) => {
   try {
@@ -59,6 +116,24 @@ router.get("/", async (_, res) => {
     res.status(500).json({ error: "Failed to fetch contributions" });
   }
 });
+
+  /**
+ * @swagger
+ * /api/contributions/{id}:
+ *   delete:
+ *     summary: Delete a contribution by ID
+ *     tags: [Contributions]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Contribution ID
+ *     responses:
+ *       200:
+ *         description: Contribution deleted
+ */
 
 // Delete a contribution
 router.delete("/:id", async (req, res) => {
