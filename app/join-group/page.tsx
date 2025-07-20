@@ -42,7 +42,7 @@ export default function JoinGroup() {
 
       // Wait 1.5 seconds before redirecting to allow toast to show
       setTimeout(() => {
-        router.push(/dashboard/${data.group_id});
+        router.push(`/dashboard/${data.group_id}`);
       }, 1500);
     } else {
       toast.error(data.error || 'Failed to join group');
