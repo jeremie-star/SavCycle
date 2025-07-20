@@ -84,7 +84,7 @@ export default function SignUpPage() {
   
     try {
       await signup(updatedForm);
-      router.push('/login');
+      router.push('/auth');
       console.log(updatedForm);
     } catch (error) {
       console.error('Signup failed:', error);
