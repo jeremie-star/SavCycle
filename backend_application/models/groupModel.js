@@ -15,6 +15,22 @@ async function generateUniqueGroupCode() {
   return code;
 }
 
+async function joinGroup(user_id, group_code) {
+  // 1. Get group id from group_code (integer)
+  const groupResult = await pool.query('SELECT id FROM groups WHERE group_code = $1', [group_code]);
+  if (groupResult.rows.length === 0) {
+    throw new Error('Group not found');
+  }
+  const group_id = groupResult.rows[0].id;
+
+  // 2. Insert into group_members with correct types
+  await pool.query(
+    'INSERT INTO group_members (group_id, user_id) VALUES ($1, $2)',
+    [group_id, user_id]
+  );
+}
+
+
 module.exports = {
   createGroup: async ({ 
   name, 
@@ -79,8 +95,8 @@ module.exports = {
   return parseInt(result.rows[0].count, 10);
 },
 
-  getGroupByCode: async (code) => {
-  const result = await pool.query("SELECT * FROM groups WHERE group_code = $1", [code]);
+  getGroupByCode: async (group_code) => {
+  const result = await pool.query("SELECT * FROM groups WHERE group_code = $1", [group_code]);
   return result.rows[0];
 }
 };
