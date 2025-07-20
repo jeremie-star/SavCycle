@@ -66,6 +66,8 @@ const auth = getAuth(firebaseApp);
  */
 router.post('/signup', async (req, res) => {
     const { email, password, full_name, phone_number, role } = req.body;
+
+    console.log(req.body);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const token = await userCredential.user.getIdToken();

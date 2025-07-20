@@ -1,10 +1,10 @@
 const pool = require("../config/db");
 
 module.exports = {
-  createUser: async ({ id, name, phone, email, password, role }) => {
+  createUser: async ({ id, full_name, phone_number, email, password, role }) => {
     await pool.query(
-      "INSERT INTO users (id, name, phone, email, password, role, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW())",
-      [id, name, phone, email, password, role]
+      "INSERT INTO users (id, full_name, phone_number, email, password, role, created_at) VALUES ($1, $2, $3, $4, $5, $6, NOW())",
+      [id, full_name, phone_number, email, password, role]
     );
   },
   getAllUsers: async () => {

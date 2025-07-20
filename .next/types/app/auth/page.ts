@@ -1,4 +1,4 @@
-// File: C:\Users\GREVY\Desktop\SavCycle\app\auth\page.tsx
+// File: /home/wiseking/Documents/savcycle-backend-app/SavCycle/app/auth/page.tsx
 import * as entry from '../../../../app/auth/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

@@ -13,8 +13,9 @@ import Link from 'next/link';
 import { GroupContributionChart } from '@/components/dashboard/contribution-chart';
 import { PaymentHistory } from '@/components/dashboard/payment-history';
 import React, { useState, useEffect } from 'react';
+import withAuth from '@/components/withAuth';
 
-export default function Dashboard() {
+const Dashboard = () => {
   const { t } = useLanguage();
 
   // Demo group members (replace with real data as needed)
@@ -241,3 +242,5 @@ export default function Dashboard() {
     </div>
   );
 }
+
+export default withAuth(Dashboard);

@@ -1,18 +1,24 @@
 'use client';
-
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
+import withGuest from '@/components/withGuest';
 
-export default function SignInPage() {
+const SignInPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
+  const { login } = useAuth(); // Use the useAuth hook
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSignIn = async (e: any) => {
     e.preventDefault();
-    console.log('Sign in:', { email, password });
-    router.push('/dashboard');
+    try {
+      await login({ email, password });
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Sign in error:', error);
+    }
   };
 
   const goHome = () => {
@@ -21,7 +27,7 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 bg-background pattern-hills text-foreground relative">
-      
+
       {/* Go back arrow to Home */}
       <button
         onClick={goHome}
@@ -47,7 +53,6 @@ export default function SignInPage() {
         <h2 className="text-2xl font-bold text-center mb-6 gradient-text">
           Welcome to Ikimina
         </h2>
-
         <form onSubmit={handleSignIn} className="space-y-4">
           <input
             type="email"
@@ -72,7 +77,6 @@ export default function SignInPage() {
             Sign In
           </button>
         </form>
-
         <p className="mt-4 text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{' '}
           <Link
@@ -86,3 +90,5 @@ export default function SignInPage() {
     </div>
   );
 }
+
+export default withGuest(SignInPage);
