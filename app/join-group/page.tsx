@@ -28,10 +28,20 @@ export default function JoinGroup() {
     return;
   }
 
+  const token = localStorage.getItem('token'); 
+
+  if (!token) {
+    toast.error('You must be logged in to join a group.');
+    return;
+  }
+
   try {
-    const res = await fetch('/api/groups/join', {
+    const res = await fetch('http://localhost:3001/api/groups/join', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
       body: JSON.stringify({ group_code: groupCode }),
     });
 
@@ -40,9 +50,9 @@ export default function JoinGroup() {
     if (res.ok) {
       toast.success('Successfully joined the group');
 
-      // Wait 1.5 seconds before redirecting to allow toast to show
       setTimeout(() => {
-        router.push(`/dashboard/${data.group_id}`);
+        // router.push(`/dashboard/${data.group_id}`);
+        router.push(`/dashboard`);
       }, 1500);
     } else {
       toast.error(data.error || 'Failed to join group');
@@ -51,6 +61,7 @@ export default function JoinGroup() {
     toast.error('Network error. Please try again.');
   }
 };
+  // Back button handler
   const handleBack = () => {
     router.back();
   };

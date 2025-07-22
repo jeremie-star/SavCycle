@@ -2,24 +2,41 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
 import withGuest from '@/components/withGuest';
+import { toast } from 'sonner';
 
 const SignInPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
-  const { login } = useAuth(); // Use the useAuth hook
 
   const handleSignIn = async (e: any) => {
-    e.preventDefault();
-    try {
-      await login({ email, password });
-      router.push('/dashboard');
-    } catch (error) {
-      console.error('Sign in error:', error);
+  e.preventDefault();
+  try {
+    const res = await fetch('http://localhost:3001/api/users/signin', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      // Optional: save token
+      localStorage.setItem('token', data.token);
+      router.push('/');
+      toast.success('Login successful', {
+        description: 'Welcome back.',
+        duration: 5000,
+      });
+    } else {
+      toast.error(data.message || 'Login failed');
+      console.error('Login error:', data);
     }
-  };
+  } catch (error) {
+    console.error('Sign in error:', error);
+    toast.error('Sign in failed. Please try again.');
+  }
+};
 
   const goHome = () => {
     router.push('/');
@@ -92,3 +109,4 @@ const SignInPage = () => {
 }
 
 export default withGuest(SignInPage);
+

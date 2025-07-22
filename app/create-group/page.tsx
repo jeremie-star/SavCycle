@@ -95,7 +95,7 @@ export default function CreateGroup() {
           </Button>
         </div>
       ),
-      duration: 8000,
+      duration: 16000,
     });
       router.push('/dashboard');
     } catch (err) {

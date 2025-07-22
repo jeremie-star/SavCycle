@@ -2,7 +2,8 @@
 import Link from 'next/link';
 import { useState, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
+
 
 interface FormState {
   name: string;
@@ -13,7 +14,6 @@ interface FormState {
 }
 
 export default function SignUpPage() {
-  const { signup } = useAuth();
   const [form, setForm] = useState<FormState>({
     name: '',
     email: '',
@@ -83,12 +83,26 @@ export default function SignUpPage() {
     };
   
     try {
-      await signup(updatedForm);
+      const res = await fetch('http://localhost:3001/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedForm),
+      });
       router.push('/auth');
       console.log(updatedForm);
+      toast .success('Account created successfully! Please log in.', {
+        description: 'You can now log in with your new account.',
+        duration: 8000,
+      });
+    if (!res.ok) {
+        const errorData = await res.json();
+        console.error('Signup failed:', errorData);
+        toast.error('Failed to create account. Please try again.');
+        return;
+      }
     } catch (error) {
       console.error('Signup failed:', error);
-      setError('Signup failed. Please try again.');
+      toast.error('Signup failed. Please try again.');
     }
   };
   
@@ -170,3 +184,5 @@ export default function SignUpPage() {
     </div>
   );
 }
+
+

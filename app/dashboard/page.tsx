@@ -13,9 +13,8 @@ import Link from 'next/link';
 import { GroupContributionChart } from '@/components/dashboard/contribution-chart';
 import { PaymentHistory } from '@/components/dashboard/payment-history';
 import React, { useState, useEffect } from 'react';
-import withAuth from '@/components/withAuth';
 
-const Dashboard = () => {
+export default function Dashboard() {
   const { t } = useLanguage();
 
   // Demo group members (replace with real data as needed)
@@ -79,6 +78,12 @@ const Dashboard = () => {
                       <li key={idx}>{name}</li>
                     ))}
                   </ol>
+                  {randomQueue.length > 0 && (
+              <div className="mt-4 text-sm">
+                  <p className="font-medium text-muted-foreground">Next to receive payout:</p>
+                  <p className="text-lg font-bold text-primary">{randomQueue[0]}</p>
+              </div>
+                    )}
                   <Button size="sm" className="mt-2" onClick={() => setRandomQueue(shuffle(groupMembers.map(m => m.name)))}>Reshuffle</Button>
                 </div>
               )}
@@ -90,7 +95,12 @@ const Dashboard = () => {
                       <li key={idx}>{name}</li>
                     ))}
                   </ol>
-                  {/* In a real app, allow drag-and-drop or editing order here */}
+                  {fixedQueue.length > 0 && (
+               <div className="mt-4 text-sm">
+               <p className="font-medium text-muted-foreground">Next to receive payout:</p>
+               <p className="text-lg font-bold text-primary">{fixedQueue[0]}</p>
+             </div>
+               )}
                 </div>
               )}
               {payoutOrderType === 'need' && (
@@ -107,6 +117,12 @@ const Dashboard = () => {
                     ))}
                   </select>
                   {needPerson && <div className="mt-2">Selected: <b>{needPerson}</b></div>}
+                  {needPerson && (
+              <div className="mt-4 text-sm">
+                  <p className="font-medium text-muted-foreground">Next to receive payout:</p>
+                  <p className="text-lg font-bold text-primary">{needPerson}</p>
+              </div>
+                )}
                 </div>
               )}
             </CardContent>
@@ -242,5 +258,3 @@ const Dashboard = () => {
     </div>
   );
 }
-
-export default withAuth(Dashboard);
