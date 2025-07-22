@@ -53,7 +53,7 @@ export default function JoinGroup() {
       setTimeout(() => {
         // router.push(`/dashboard/${data.group_id}`);
         router.push(`/dashboard`);
-      }, 1500);
+      }, 1000);
     } else {
       toast.error(data.error || 'Failed to join group');
     }
