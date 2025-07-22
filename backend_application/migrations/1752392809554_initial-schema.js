@@ -2,9 +2,9 @@ exports.up = (pgm) => {
   pgm.sql('CREATE EXTENSION IF NOT EXISTS "pgcrypto";');
 
   // USERS
-   pgm.createTable('users', {
-    id: 'id',
-    uid: { type: 'uuid', notNull: true, unique: true, default: pgm.func('gen_random_uuid()') },
+  pgm.createTable('users', {
+    id: { type: 'uuid', default: pgm.func('gen_random_uuid()') },  // just extra col, no PK
+    uid: { type: 'uuid', primaryKey: true, notNull: true, unique: true, default: pgm.func('gen_random_uuid()') },  // PK column
     full_name: { type: 'varchar(100)', notNull: true },
     email: { type: 'varchar(100)', notNull: true, unique: true },
     phone_number: { type: 'varchar(20)', notNull: true },
@@ -15,30 +15,29 @@ exports.up = (pgm) => {
 
   // GROUPS
   pgm.createTable('groups', {
-    id: 'id',
-    full_name: { type: 'varchar(100)', notNull: true },
+    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
+    name: { type: 'varchar(100)', notNull: true },
     contribution_amount: { type: 'numeric', notNull: true },
     contribution_frequency: { type: 'varchar(50)', notNull: true },
     number_of_members: { type: 'integer', notNull: true },
     payout_order: { type: 'varchar(50)', notNull: true },
     cycle_start_date: { type: 'date', notNull: true },
     group_code: { type: 'varchar(10)', notNull: true, unique: true },
-    created_by: { type: 'uuid', notNull: true },  // reference users.uid
     created_at: { type: 'timestamp', default: pgm.func('now()') }
   });
 
   // GROUP MEMBERS
   pgm.createTable('group_members', {
-    id: 'id',
-    group_id: { type: 'integer', references: 'groups(id)', onDelete: 'cascade', notNull: true },
+    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
+    group_id: { type: 'uuid', references: 'groups(id)', onDelete: 'cascade', notNull: true },
     user_id: { type: 'uuid', references: 'users(uid)', onDelete: 'cascade', notNull: true },
     joined_at: { type: 'timestamp', default: pgm.func('now()') }
   });
 
   // CONTRIBUTIONS
   pgm.createTable('contributions', {
-    id: 'id',
-    group_id: { type: 'integer', references: 'groups(id)', onDelete: 'cascade', notNull: true },
+    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
+    group_id: { type: 'uuid', references: 'groups(id)', onDelete: 'cascade', notNull: true },
     user_id: { type: 'uuid', references: 'users(uid)', onDelete: 'cascade', notNull: true },
     amount: { type: 'numeric', notNull: true },
     payment_method: { type: 'varchar(20)', default: 'mobile-money' },
@@ -48,19 +47,19 @@ exports.up = (pgm) => {
 
   // PAYOUTS
   pgm.createTable('payouts', {
-    id: 'id',
-    group_id: { type: 'integer', references: 'groups(id)', onDelete: 'cascade', notNull: true },
+    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
+    group_id: { type: 'uuid', references: 'groups(id)', onDelete: 'cascade', notNull: true },
     user_id: { type: 'uuid', references: 'users(uid)', onDelete: 'cascade', notNull: true },
     amount: { type: 'numeric', notNull: true },
     payout_date: { type: 'date', notNull: true },
-    approved_by: { type: 'uuid' },
+    approved_by: { type: 'uuid', references: 'users(uid)' }, // optional FK
     status: { type: 'varchar(20)', default: 'pending' }
   });
 
   // TRANSACTIONS
   pgm.createTable('transactions', {
-    id: 'id',
-    group_id: { type: 'integer', references: 'groups(id)', onDelete: 'cascade', notNull: true },
+    id: { type: 'uuid', primaryKey: true, default: pgm.func('gen_random_uuid()') },
+    group_id: { type: 'uuid', references: 'groups(id)', onDelete: 'cascade', notNull: true },
     user_id: { type: 'uuid', references: 'users(uid)', onDelete: 'cascade', notNull: true },
     type: { type: 'varchar(20)', notNull: true },
     amount: { type: 'numeric', notNull: true },

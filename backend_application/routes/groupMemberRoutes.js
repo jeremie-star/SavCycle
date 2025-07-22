@@ -2,37 +2,7 @@ const express = require("express");
 const router = express.Router();
 const groupMemberModel = require("../models/groupMemberModel");
 
-/**
- * @swagger
- * tags:
- *   name: Group Members
- *   description: Group membership management
- */
 
-/**
- * @swagger
- * /api/group-members:
- *   post:
- *     summary: Add a user to a group
- *     tags: [Group Members]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - user_id
- *               - group_id
- *             properties:
- *               user_id:
- *                 type: string
- *               group_id:
- *                 type: string
- *     responses:
- *       201:
- *         description: Member added to the group
- */
 
 // Add a member to a group
 router.post("/", async (req, res) => {
@@ -48,16 +18,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/group-members:
- *   get:
- *     summary: Retrieve all group members
- *     tags: [Group Members]
- *     responses:
- *       200:
- *         description: A list of group members
- */
 
 // Get all group members
 router.get("/", async (_, res) => {
@@ -68,24 +28,6 @@ router.get("/", async (_, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-
-/**
- * @swagger
- * /api/group-members/{id}:
- *   delete:
- *     summary: Remove a member from a group by ID
- *     tags: [Group Members]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: Member ID
- *     responses:
- *       200:
- *         description: Member removed from group
- */
 
 // Delete a group member by ID
 router.delete("/:id", async (req, res) => {

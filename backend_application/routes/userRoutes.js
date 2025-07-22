@@ -27,6 +27,17 @@ function checkAuth(req, res, next) {
   }
 }
 
+router.get('/', async (req, res) => {
+  try {
+    const users = await userModel.getAllUsers();
+    const safeUsers = users.map(({ password, ...user }) => user);
+    res.json(safeUsers);
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    res.status(500).json({ error: 'Failed to fetch users' });
+  }
+});
+
 router.post('/', async (req, res) => {
   try {
     const { full_name, phone_number, email, password, role } = req.body;
@@ -74,7 +85,7 @@ router.post('/signin', async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.role },
+      { id: user.id, email: user.email, role: user.role, uid: user.id, },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );

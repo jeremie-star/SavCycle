@@ -15,21 +15,6 @@ async function generateUniqueGroupCode() {
   return code;
 }
 
-async function joinGroup(user_id, group_code) {
-  // 1. Get group id from group_code (integer)
-  const groupResult = await pool.query('SELECT id FROM groups WHERE group_code = $1', [group_code]);
-  if (groupResult.rows.length === 0) {
-    throw new Error('Group not found');
-  }
-  const group_id = groupResult.rows[0].id;
-
-  // 2. Insert into group_members with correct types
-  await pool.query(
-    'INSERT INTO group_members (group_id, user_id) VALUES ($1, $2)',
-    [group_id, user_id]
-  );
-}
-
 
 module.exports = {
   createGroup: async ({ 
@@ -38,15 +23,14 @@ module.exports = {
   contribution_frequency, 
   number_of_members,    
   payout_order,          
-  cycle_start_date,
-  created_by              
+  cycle_start_date,            
 }) => {
   const group_code = await generateUniqueGroupCode();
 
   const result = await pool.query(
     `INSERT INTO groups 
-      (name, contribution_amount, contribution_frequency, number_of_members, payout_order, cycle_start_date, group_code, created_by, created_at) 
-     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) 
+      (name, contribution_amount, contribution_frequency, number_of_members, payout_order, cycle_start_date, group_code, created_at) 
+     VALUES ($1, $2, $3, $4, $5, $6, $7, NOW()) 
      RETURNING *`,
     [
       name,
@@ -56,7 +40,6 @@ module.exports = {
       payout_order,
       cycle_start_date,
       group_code,
-      created_by
     ]
   );
 
