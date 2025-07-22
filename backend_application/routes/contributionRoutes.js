@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const contributionModel = require("../models/contributionModel");
-const auth = require("../middleware/firebaseAuth");
 
 const allowedPaymentMethods = ["mobile-money", "card"];
 const allowedStatuses = ["completed", "incomplete", "pending"];
@@ -53,7 +52,7 @@ const allowedStatuses = ["completed", "incomplete", "pending"];
 
 
 // Create a new contribution
-router.post("/", auth, async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const {
       user_id,

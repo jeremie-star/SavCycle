@@ -1,184 +1,95 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const userModel = require("../models/userModel");
-const auth = require("../middleware/firebaseAuth");
+const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcryptjs');
+const userModel = require('../models/userModel');
+const jwt = require('jsonwebtoken');
+const pool = require('../config/db'); 
 
-/**
- * @swagger
- * tags:
- *   name: Users
- *   description: User management
- */
+// --- Authentication middleware ---
+function checkAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
 
-/**
- * @swagger
- * /api/users:
- *   post:
- *     summary: Create a new user
- *     tags: [Users]
- *     security:
- *       - firebaseAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             example:
- *               name: John Doe
- *               email: john@example.com
- *     responses:
- *       201:
- *         description: User created
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: User created
- *       500:
- *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- */
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Authorization header missing or malformed' });
+  }
 
+  const token = authHeader.split(' ')[1];
 
-router.post("/", auth ,async (req, res) => {
   try {
-    await userModel.createUser({ id: req.user.uid, ...req.body });
-    res.status(201).json({ message: "User created" });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Assuming your token payload contains 'uid' as user UUID
+    req.user = { uid: decoded.uid || decoded.id };
+    console.log('User authenticated:', req.user.uid);
+    next();
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+}
+
+router.post('/', async (req, res) => {
+  try {
+    const { full_name, phone_number, email, password, role } = req.body;
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const id = uuidv4();
+
+    await userModel.createUser({
+      id,
+      full_name,
+      phone_number,
+      email,
+      password: hashedPassword,
+      role,
+    });
+
+    res.status(201).json({ message: 'User created successfully' });
+  } catch (err) {
+    console.error('Signup error:', err.stack || err);
+    res.status(500).json({ error: 'Failed to create user' });
   }
 });
 
-/**
- * @swagger
- * /api/users:
- *   get:
- *     summary: Get all users
- *     tags: [Users]
- *     responses:
- *       200:
- *         description: List of users
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/User'
- */
+router.post('/signin', async (req, res) => {
+  const { email, password } = req.body;
 
-router.get("/", async (_, res) => {
-  const users = await userModel.getAllUsers();
-  res.json(users);
+  try {
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+    // Find user by email
+    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    // Return token and minimal user info (no password)
+    const { password: pw, ...userWithoutPassword } = user;
+
+    res.json({ token, user: userWithoutPassword });
+  } catch (err) {
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
 });
 
-/**
- * @swagger
- * /api/users/{id}:
- *   get:
- *     summary: Get user by ID
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: User ID
- *     responses:
- *       200:
- *         description: User found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       404:
- *         description: User not found
- */
-
-router.get("/:id", async (req, res) => {
-  const user = await userModel.getUserById(req.params.id);
-  res.json(user);
-});
-
-/**
- * @swagger
- * /api/users/{id}:
- *   put:
- *     summary: Update user by ID
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: User ID
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             example:
- *               name: Jane Doe
- *               email: jane@example.com
- *     responses:
- *       200:
- *         description: User updated
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/User'
- *       404:
- *         description: User not found
- */
-
-router.put("/:id", async (req, res) => {
-  const updated = await userModel.updateUser(req.params.id, req.body);
-  res.json(updated);
-});
-
-/**
- * @swagger
- * /api/users/{id}:
- *   delete:
- *     summary: Delete user by ID
- *     tags: [Users]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: User ID
- *     responses:
- *       200:
- *         description: User deleted
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: User deleted
- *       404:
- *         description: User not found
- */
-
-router.delete("/:id", async (req, res) => {
-  await userModel.deleteUser(req.params.id);
-  res.json({ message: "User deleted" });
-});
 
 module.exports = router;
+module.exports.checkAuth = checkAuth;
+
