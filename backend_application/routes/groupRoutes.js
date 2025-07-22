@@ -106,11 +106,11 @@ router.post("/join",checkAuth, async (req, res) => {
       return res.status(400).json({ error: "Group is already full." });
     }
     // 5. Add user to group
-    // await pool.query(
-    //   `INSERT INTO group_members (group_id, user_id, joined_at)
-    //    VALUES ($1, $2, NOW())`,
-    //   [group.id, user_id]
-    // );
+    await pool.query(
+      `INSERT INTO group_members (group_id, user_id, joined_at)
+       VALUES ($1, $2, NOW())`,
+      [group.id, user_id]
+    );
 
     res.status(200).json({
       message: "Successfully joined the group.",
