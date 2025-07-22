@@ -65,7 +65,7 @@ export function Header({ title, showBackButton = false, onBack }: HeaderProps) {
       <div className="flex items-center gap-2">
         <LanguageToggle />
         <ThemeToggle />
-        <AuthButton /> {/* Auth button added here */}
+        <AuthButton /> 
       </div>
     </header>
   );

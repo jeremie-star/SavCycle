@@ -78,6 +78,12 @@ export default function Dashboard() {
                       <li key={idx}>{name}</li>
                     ))}
                   </ol>
+                  {randomQueue.length > 0 && (
+              <div className="mt-4 text-sm">
+                  <p className="font-medium text-muted-foreground">Next to receive payout:</p>
+                  <p className="text-lg font-bold text-primary">{randomQueue[0]}</p>
+              </div>
+                    )}
                   <Button size="sm" className="mt-2" onClick={() => setRandomQueue(shuffle(groupMembers.map(m => m.name)))}>Reshuffle</Button>
                 </div>
               )}
@@ -89,7 +95,12 @@ export default function Dashboard() {
                       <li key={idx}>{name}</li>
                     ))}
                   </ol>
-                  {/* In a real app, allow drag-and-drop or editing order here */}
+                  {fixedQueue.length > 0 && (
+               <div className="mt-4 text-sm">
+               <p className="font-medium text-muted-foreground">Next to receive payout:</p>
+               <p className="text-lg font-bold text-primary">{fixedQueue[0]}</p>
+             </div>
+               )}
                 </div>
               )}
               {payoutOrderType === 'need' && (
@@ -106,6 +117,12 @@ export default function Dashboard() {
                     ))}
                   </select>
                   {needPerson && <div className="mt-2">Selected: <b>{needPerson}</b></div>}
+                  {needPerson && (
+              <div className="mt-4 text-sm">
+                  <p className="font-medium text-muted-foreground">Next to receive payout:</p>
+                  <p className="text-lg font-bold text-primary">{needPerson}</p>
+              </div>
+                )}
                 </div>
               )}
             </CardContent>

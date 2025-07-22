@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const payoutModel = require("../models/payoutModel");
-const auth = require("../middleware/firebaseAuth");
 
 /**
  * @swagger
@@ -48,7 +47,7 @@ const auth = require("../middleware/firebaseAuth");
  *         description: Payout created
  */
 
-router.post("/", auth, async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const payout = await payoutModel.createPayout(req.body);
     res.status(201).json(payout);

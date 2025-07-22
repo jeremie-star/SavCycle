@@ -5,9 +5,9 @@ exports.up = (pgm) => {
    pgm.createTable('users', {
     id: 'id',
     uid: { type: 'uuid', notNull: true, unique: true, default: pgm.func('gen_random_uuid()') },
-    name: { type: 'varchar(100)', notNull: true },
+    full_name: { type: 'varchar(100)', notNull: true },
     email: { type: 'varchar(100)', notNull: true, unique: true },
-    phone: { type: 'varchar(20)', notNull: true },
+    phone_number: { type: 'varchar(20)', notNull: true },
     password: { type: 'text', notNull: true },
     role: { type: 'varchar(20)', notNull: true, default: "'member'" }, 
     created_at: { type: 'timestamp', default: pgm.func('now()') }
@@ -16,7 +16,7 @@ exports.up = (pgm) => {
   // GROUPS
   pgm.createTable('groups', {
     id: 'id',
-    name: { type: 'varchar(100)', notNull: true },
+    full_name: { type: 'varchar(100)', notNull: true },
     contribution_amount: { type: 'numeric', notNull: true },
     contribution_frequency: { type: 'varchar(50)', notNull: true },
     number_of_members: { type: 'integer', notNull: true },

@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useState } from 'react';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Copy } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import {
   Popover,
@@ -32,6 +32,7 @@ import {
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export default function CreateGroup() {
   const { t } = useLanguage();
@@ -71,12 +72,31 @@ export default function CreateGroup() {
       if (!res.ok) {
         const errorData = await res.json();
         console.error('Failed to create group:', errorData);
-        alert('Failed to create group');
+        toast.error('Failed to create group');
         return;
       }
 
       const data = await res.json();
       console.log('Group created:', data);
+      toast.success('Group created successfully!', {
+      description: (
+        <div className="flex items-center justify-between">
+          <span className="font-medium">Code: {data.group_code}</span>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              navigator.clipboard.writeText(data.group_code);
+              toast.success('Code copied to clipboard!');
+            }}
+          >
+            <Copy className="h-4 w-4 mr-1" />
+            Copy
+          </Button>
+        </div>
+      ),
+      duration: 16000,
+    });
       router.push('/dashboard');
     } catch (err) {
       console.error('Request failed', err);

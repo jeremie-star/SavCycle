@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const transactionModel = require("../models/transactionModel");
-const auth = require("../middleware/firebaseAuth");
 
 /**
  * @swagger
@@ -44,7 +43,7 @@ const auth = require("../middleware/firebaseAuth");
  *         description: Transaction created
  */
 
-router.post("/", auth, async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const transaction = await transactionModel.createTransaction(req.body);
     res.status(201).json(transaction);

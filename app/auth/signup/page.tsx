@@ -1,11 +1,20 @@
 'use client';
-
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+
+
+interface FormState {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+  confirmPassword: string;
+}
 
 export default function SignUpPage() {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormState>({
     name: '',
     email: '',
     phone: '',
@@ -13,10 +22,10 @@ export default function SignUpPage() {
     confirmPassword: '',
   });
 
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string>('');
   const router = useRouter();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     if (name === 'phone' && !/^\d*$/.test(value)) {
@@ -55,17 +64,48 @@ export default function SignUpPage() {
     return '';
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+  
     const validationError = validateForm();
     if (validationError) {
       setError(validationError);
       return;
     }
-
-    console.log('Signing up with:', form);
-    router.push('/dashboard');
+  
+    const { confirmPassword, phone, name, ...restForm } = form;
+    const updatedForm = { 
+      ...restForm, 
+      full_name: name,
+      phone_number: phone,
+      password: confirmPassword, 
+      role: 'member' 
+    };
+  
+    try {
+      const res = await fetch('http://localhost:3001/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedForm),
+      });
+      router.push('/auth');
+      console.log(updatedForm);
+      toast .success('Account created successfully! Please log in.', {
+        description: 'You can now log in with your new account.',
+        duration: 8000,
+      });
+    if (!res.ok) {
+        const errorData = await res.json();
+        console.error('Signup failed:', errorData);
+        toast.error('Failed to create account. Please try again.');
+        return;
+      }
+    } catch (error) {
+      console.error('Signup failed:', error);
+      toast.error('Signup failed. Please try again.');
+    }
   };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 pattern-hills bg-background text-foreground">
@@ -73,13 +113,11 @@ export default function SignUpPage() {
         <h2 className="text-2xl font-bold text-center mb-4 gradient-text">
           Create Your Account
         </h2>
-
         {error && (
           <div className="text-red-600 text-sm text-center mb-3">
             {error}
           </div>
         )}
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="text"
@@ -90,7 +128,6 @@ export default function SignUpPage() {
             className="w-full p-3 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/80"
             required
           />
-
           <input
             type="email"
             name="email"
@@ -100,7 +137,6 @@ export default function SignUpPage() {
             className="w-full p-3 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/80"
             required
           />
-
           <input
             type="tel"
             name="phone"
@@ -110,7 +146,6 @@ export default function SignUpPage() {
             className="w-full p-3 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/80"
             required
           />
-
           <input
             type="password"
             name="password"
@@ -120,7 +155,6 @@ export default function SignUpPage() {
             className="w-full p-3 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/80"
             required
           />
-
           <input
             type="password"
             name="confirmPassword"
@@ -130,7 +164,6 @@ export default function SignUpPage() {
             className="w-full p-3 border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/80"
             required
           />
-
           <button
             type="submit"
             className="w-full py-3 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition font-semibold"
@@ -138,7 +171,6 @@ export default function SignUpPage() {
             Sign Up
           </button>
         </form>
-
         <p className="mt-4 text-center text-sm text-muted-foreground">
           Already have an account?{' '}
           <Link
@@ -152,3 +184,5 @@ export default function SignUpPage() {
     </div>
   );
 }
+
+
