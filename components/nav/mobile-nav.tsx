@@ -1,14 +1,64 @@
 "use client";
 
+import { useEffect, useState } from 'react';
 import { Home, LayoutDashboard, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/language-context';
+import { jwtDecode } from "jwt-decode";
+import { toast } from 'sonner';
+
+
+interface DecodedToken {
+  groupId?: string;
+  [key: string]: any;
+}
 
 export function MobileNav() {
   const pathname = usePathname();
   const { t } = useLanguage();
+  const [groupId, setGroupId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    try {
+      const decoded: DecodedToken = jwtDecode(token);
+      console.log("Decoded Token:", decoded);
+
+      const uid = decoded.uid || decoded.id || decoded.userId;
+
+      if (uid) {
+        setUserId(uid);
+
+        // Fetch group ID associated with the user
+        fetch('http://localhost:3001/api/members/my-group', {
+           method: 'GET',
+           headers: {
+               'Content-Type': 'application/json',
+               'Authorization': `Bearer ${token}`, 
+               },
+             })
+          .then(res => res.json())
+          .then(data => {
+            if (data.group_id) {
+              setGroupId(data.group_id);
+            }
+          })
+          .catch(err => {
+            console.error("Failed to fetch group ID", err);
+            toast.error("Failed to fetch group ID");
+          });
+      }
+    } catch (err) {
+      console.error("Failed to decode token", err);
+      toast.error("Invalid token");
+    }
+  }
+}, []);
+
 
   const navItems = [
     {
@@ -16,11 +66,13 @@ export function MobileNav() {
       href: '/',
       icon: Home,
     },
-    {
-      name: t('nav.dashboard'),
-      href: '/dashboard',
-      icon: LayoutDashboard,
-    },
+    ...(userId && groupId
+      ? [{
+          name: t('nav.dashboard'),
+          href: `/dashboard/${groupId}`,
+          icon: LayoutDashboard,
+        }]
+      : []),
     {
       name: t('nav.settings'),
       href: '/settings',

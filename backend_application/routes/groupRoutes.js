@@ -50,6 +50,13 @@ res.status(201).json({
   }
 });
 
+  // const user_id = req.user.id;  
+//     await pool.query(
+//       `INSERT INTO group_members (group_id, user_id, joined_at)
+//        VALUES ($1, $2, NOW())`,
+//       [group.id, user_id]
+//     );
+
 
 // Get a single group by ID
 router.get("/:id", async (req, res) => {

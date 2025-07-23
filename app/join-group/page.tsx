@@ -51,8 +51,8 @@ export default function JoinGroup() {
       toast.success('Successfully joined the group');
 
       setTimeout(() => {
-        // router.push(`/dashboard/${data.group_id}`);
-        router.push(`/dashboard`);
+        // Redirect to the group's dashboard
+        router.push(`/dashboard/${data.group_code}`); 
       }, 1000);
     } else {
       toast.error(data.error || 'Failed to join group');

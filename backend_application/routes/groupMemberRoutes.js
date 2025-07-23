@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const pool = require("../config/db"); 
 const groupMemberModel = require("../models/groupMemberModel");
-
+const checkAuth = require('../routes/userRoutes').checkAuth;
 
 
 // Add a member to a group
@@ -29,13 +30,45 @@ router.get("/", async (_, res) => {
   }
 });
 
-// Delete a group member by ID
-router.delete("/:id", async (req, res) => {
+//GET /api/members/my-group → Returns group_id for logged-in user
+router.get("/my-group", checkAuth, async (req, res) => {
   try {
-    await groupMemberModel.deleteMember(req.params.id);
-    res.json({ message: "Member deleted" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    const userId = req.user.uid;
+    console.log("🔍 User ID in /my-group:", userId);
+
+    if (!userId) {
+      return res.status(400).json({ error: "Missing user ID from token" });
+    }
+
+    const result = await pool.query(
+      "SELECT group_id FROM group_members WHERE user_id = $1",
+      [userId]
+    );
+
+    console.log(" DB result:", result.rows);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "User is not part of any group" });
+    }
+
+    res.json({ group_id: result.rows[0].group_id });
+  } catch (error) {
+    console.error(" Error fetching user's group:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+router.get("/my-members/:groupId", async (req, res) => {
+  const { groupId } = req.params;
+  try {
+    const result = await pool.query(
+      "SELECT u.id, u.full_name FROM group_members gm JOIN users u ON gm.user_id = u.id WHERE gm.group_id = $1",
+      [groupId]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error fetching group's members:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

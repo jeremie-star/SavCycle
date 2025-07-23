@@ -21,6 +21,7 @@ function checkAuth(req, res, next) {
     // Assuming your token payload contains 'uid' as user UUID
     req.user = { uid: decoded.uid || decoded.id };
     console.log('User authenticated:', req.user.uid);
+    console.log('Auth header:', req.headers.authorization);
     next();
   } catch (err) {
     return res.status(401).json({ error: 'Invalid or expired token' });

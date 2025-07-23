@@ -97,7 +97,12 @@ export default function CreateGroup() {
       ),
       duration: 16000,
     });
-      router.push('/dashboard');
+     const groupId = data.group?.id || data.group?.group_code;
+
+  if (groupId) {
+    // Redirect to dashboard
+    router.push(`/dashboard/${groupId}`);
+  }
     } catch (err) {
       console.error('Request failed', err);
       alert('An error occurred');
