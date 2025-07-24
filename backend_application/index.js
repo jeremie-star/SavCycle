@@ -23,7 +23,7 @@ app.get("/", (req, res) => {
 
 // Route registrations
 app.use("/api/users", userRoutes);
-app.use("/api/users/signin", userRoutes);
+// app.use("/api/users/signin", userRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/members", groupMemberRoutes);
 app.use("/api/contributions", contributionRoutes);
