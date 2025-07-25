@@ -5,58 +5,10 @@ const contributionModel = require("../models/contributionModel");
 const allowedPaymentMethods = ["mobile-money", "card"];
 const allowedStatuses = ["completed", "incomplete", "pending"];
 
-/**
- * @swagger
- * tags:
- *   name: Contributions
- *   description: Contribution management routes
- */
-
-/**
- * @swagger
- * /api/contributions:
- *   post:
- *     summary: Create a new contribution
- *     tags: [Contributions]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - user_id
- *               - group_id
- *               - amount
- *               - contribution_date
- *               - payment_method
- *               - status
- *             properties:
- *               user_id:
- *                 type: string
- *               group_id:
- *                 type: string
- *               amount:
- *                 type: number
- *               contribution_date:
- *                 type: string
- *                 format: date
- *               payment_method:
- *                 type: string
- *               status:
- *                 type: string
- *     responses:
- *       201:
- *         description: Contribution created
- */
-
-
 // Create a new contribution
-router.post("/", async (req, res) => {
+router.post("/:group_id", async (req, res) => {
   try {
     const {
-      user_id,
-      group_id,
       amount,
       contribution_date,  
       payment_method = 'mobile-money', 
@@ -64,8 +16,8 @@ router.post("/", async (req, res) => {
     } = req.body;
 
     // Validate required fields
-    if (!user_id || !group_id || !amount) {
-      return res.status(400).json({ error: "user_id, group_id and amount are required." });
+    if (!amount) {
+      return res.status(400).json({ error: "amount is required." });
     }
 
     // Validate payment method
@@ -94,16 +46,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-/**
- * @swagger
- * /api/contributions:
- *   get:
- *     summary: Retrieve all contributions
- *     tags: [Contributions]
- *     responses:
- *       200:
- *         description: A list of contributions
- */
 
 // Get all contributions
 router.get("/", async (_, res) => {
@@ -115,24 +57,6 @@ router.get("/", async (_, res) => {
     res.status(500).json({ error: "Failed to fetch contributions" });
   }
 });
-
-  /**
- * @swagger
- * /api/contributions/{id}:
- *   delete:
- *     summary: Delete a contribution by ID
- *     tags: [Contributions]
- *     parameters:
- *       - in: path
- *         name: id
- *         schema:
- *           type: string
- *         required: true
- *         description: Contribution ID
- *     responses:
- *       200:
- *         description: Contribution deleted
- */
 
 // Delete a contribution
 router.delete("/:id", async (req, res) => {

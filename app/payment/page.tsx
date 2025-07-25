@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CreditCard, Smartphone, AlertCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useRouter } from 'next/navigation';
@@ -28,6 +28,14 @@ export default function Payment() {
   });
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [amount, setAmount] = useState<number>(5000); 
+
+  useEffect(() => {
+  const storedMethod = localStorage.getItem("selected_payment_method");
+  if (storedMethod) {
+    setPaymentMethod(storedMethod);
+  }
+}, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,18 +61,51 @@ export default function Payment() {
     setShowConfirmation(true);
   };
 
-  const handleConfirm = () => {
-    setShowConfirmation(false);
-    
+  const handleConfirm = async () => {
+  setShowConfirmation(false);
+
+  try {
     toast({
       title: "Processing payment...",
       description: "Please wait while we process your contribution."
     });
-    
-    setTimeout(() => {
-      setShowSuccess(true);
-    }, 2000);
-  };
+    const user_id = localStorage.getItem('user_id');
+    const group_id = localStorage.getItem('group_id');
+    console.log(`User ID: ${user_id}, Group ID: ${group_id}, Payment Method: ${paymentMethod}`);
+    // Ensure user_id and group_id are available
+    if (!user_id || !group_id) {
+      throw new Error("User or group ID not found");
+    }
+    const response = await fetch('/api/contributions/${groupId}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        amount: amount,
+        payment_method: paymentMethod,
+        status: "completed"
+      })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Failed to process payment");
+    }
+
+    toast({
+      title: "Success",
+      description: "Your contribution was successful!",
+    });
+
+    setShowSuccess(true);
+  } catch (err: any) {
+    toast({
+      title: "Payment failed",
+      description: err.message,
+      variant: "destructive"
+    });
+  }
+};
+
 
   const handleComplete = () => {
     setShowSuccess(false);
@@ -91,7 +132,7 @@ export default function Payment() {
           <CardHeader>
             <CardTitle>{t('payment.title')}</CardTitle>
             <CardDescription>
-              Make your contribution to the Family Savings Group
+              Make your contribution Now
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
@@ -100,17 +141,18 @@ export default function Payment() {
                 <Label htmlFor="amount">{t('payment.amount')}</Label>
                 <div className="relative">
                   <Input 
-                    id="amount" 
-                    value="5,000" 
-                    disabled
-                    className="pl-16"
-                  />
+                     id="amount"
+                     type="number"
+                     value={amount}
+                     onChange={(e) => setAmount(Number(e.target.value))}
+                     className="pl-16"
+                      />
                   <div className="absolute inset-y-0 left-0 flex items-center px-3 pointer-events-none border-r bg-muted/50">
                     <span className="text-sm font-medium">RWF</span>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Fixed weekly contribution amount
+                  Fixed contribution amount
                 </p>
               </div>
               
@@ -119,7 +161,10 @@ export default function Payment() {
                 <RadioGroup 
                   defaultValue="mobile-money" 
                   value={paymentMethod}
-                  onValueChange={setPaymentMethod}
+                  onValueChange={(value) => {
+                     setPaymentMethod(value);
+                        localStorage.setItem("selected_payment_method", value);
+             }}
                 >
                   <div className="flex items-center space-x-2 border rounded-md p-3">
                     <RadioGroupItem value="mobile-money" id="mobile-money" />
@@ -244,7 +289,7 @@ export default function Payment() {
           <div className="bg-muted/50 p-3 rounded-md space-y-2">
             <div className="flex justify-between">
               <span className="text-sm">Amount:</span>
-              <span className="font-medium">5,000 RWF</span>
+              <span className="font-medium">{amount} RWF</span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm">Payment Method:</span>
@@ -264,7 +309,7 @@ export default function Payment() {
             </div>
             <div className="flex justify-between border-t pt-2 mt-2">
               <span className="text-sm font-medium">Total:</span>
-              <span className="font-bold">5,000 RWF</span>
+              <span className="font-bold">{amount} RWF</span>
             </div>
           </div>
           <DialogFooter className="sm:justify-between">

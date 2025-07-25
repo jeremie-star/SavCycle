@@ -16,7 +16,7 @@ import React, { useState, useEffect } from 'react';
 
 interface Member {
   id: string;
-  name: string;
+  full_name: string;
   status: 'paid' | 'pending';
   isYou?: boolean;
 }
@@ -47,7 +47,7 @@ export default function Dashboard({ group, members }: DashboardProps) {
 
   // Payout order logic state
   const [payoutOrderType, setPayoutOrderType] = useState<'random' | 'fixed' | 'need'>(group.payout_order || 'random');
-  const [fixedQueue, setFixedQueue] = useState(groupMembers.map(m => m.name));
+  const [fixedQueue, setFixedQueue] = useState(groupMembers.map(m => m.full_name));
   const [randomQueue, setRandomQueue] = useState<string[]>([]);
   const [needPerson, setNeedPerson] = useState<string | null>(null);
 
@@ -64,7 +64,7 @@ export default function Dashboard({ group, members }: DashboardProps) {
   // Update random queue on payoutOrderType change
   useEffect(() => {
     if (payoutOrderType === 'random') {
-      setRandomQueue(shuffle(groupMembers.map(m => m.name)));
+      setRandomQueue(shuffle(groupMembers.map(m => m.full_name)));
     }
   }, [payoutOrderType, groupMembers]);
 
@@ -115,7 +115,7 @@ export default function Dashboard({ group, members }: DashboardProps) {
                       <p className="text-lg font-bold text-primary">{randomQueue[0]}</p>
                     </div>
                   )}
-                  <Button size="sm" className="mt-2" onClick={() => setRandomQueue(shuffle(groupMembers.map(m => m.name)))}>
+                  <Button size="sm" className="mt-2" onClick={() => setRandomQueue(shuffle(groupMembers.map(m => m.full_name)))}>
                     Reshuffle
                   </Button>
                 </div>
@@ -148,8 +148,8 @@ export default function Dashboard({ group, members }: DashboardProps) {
                       Select member
                     </option>
                     {groupMembers.map((m, idx) => (
-                      <option key={idx} value={m.name}>
-                        {m.name}
+                      <option key={idx} value={m.full_name}>
+                        {m.full_name}
                       </option>
                     ))}
                   </select>
@@ -271,10 +271,10 @@ export default function Dashboard({ group, members }: DashboardProps) {
                       >
                         <div className="flex items-center">
                           <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center mr-2">
-                            <span className="text-xs font-medium">{member.name.charAt(0)}</span>
+                            <span className="text-xs font-medium">{member.full_name.charAt(0)}</span>
                           </div>
                           <span className="font-medium">
-                            {member.name} {member.isYou && '(You)'}
+                            {member.full_name} {member.isYou && '(You)'}
                           </span>
                         </div>
                         <Badge

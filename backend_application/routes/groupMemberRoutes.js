@@ -58,13 +58,17 @@ router.get("/my-group", checkAuth, async (req, res) => {
   }
 });
 
-router.get("/my-members/:groupId", async (req, res) => {
+router.get("/group/:groupId", async (req, res) => {
   const { groupId } = req.params;
   try {
+    console.log(`Fetching members for group: ${groupId}`);
+    
     const result = await pool.query(
       "SELECT u.id, u.full_name FROM group_members gm JOIN users u ON gm.user_id = u.id WHERE gm.group_id = $1",
       [groupId]
     );
+    
+    console.log(`Found ${result.rows.length} members for group ${groupId}`);
     res.json(result.rows);
   } catch (error) {
     console.error("Error fetching group's members:", error);

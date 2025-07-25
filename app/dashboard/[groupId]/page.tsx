@@ -13,8 +13,9 @@ interface GroupData {
 
 interface MemberData {
   id: string;
-  name: string;
+  full_name: string;
   status: 'paid' | 'pending';
+  joinedDate?: string;
   isYou?: boolean;
 }
 
@@ -29,6 +30,7 @@ export default async function DashboardPage({
 
   console.log(`Fetching group from: ${API_BASE}/api/groups/${groupId}`);
 
+  // Fetch group data
   const groupRes = await fetch(`${API_BASE}/api/groups/${groupId}`, {
     cache: 'no-store',
   });
@@ -40,16 +42,28 @@ export default async function DashboardPage({
   }
   const group: GroupData = await groupRes.json();
 
-  // const membersRes = await fetch(`${API_BASE}/api/groups/${groupId}/members`, {
-  //   cache: 'no-store',
-  // });
+  // Fetch members data
+  let members: MemberData[] = [];
+  
+  try {
+    console.log(`Fetching members from: ${API_BASE}/api/members/group/${groupId}`);
+    
+    const membersRes = await fetch(`${API_BASE}/api/members/group/${groupId}`, {
+      cache: 'no-store',
+    });
 
-  // if (!membersRes.ok) {
-  //   const errorText = await membersRes.text();
-  //   console.error('Members fetch failed:', membersRes.status, errorText);
-  //   throw new Error('Failed to fetch members');
-  // }
-  // const members: MemberData[] = await membersRes.json();
+    if (membersRes.ok) {
+      members = await membersRes.json();
+      console.log(`Found ${members.length} members for group ${groupId}:`, members);
+    } else {
+      const errorText = await membersRes.text();
+      console.error('Members fetch failed:', membersRes.status, errorText);
+      // Don't throw error, just use empty array
+    }
+  } catch (error) {
+    console.error('Error fetching members:', error);
+    // Continue with empty members array
+  }
 
-  return <Dashboard group={group} members={[]} />;
+  return <Dashboard group={group} members={members} />;
 }
