@@ -1,5 +1,3 @@
-'use client';
-
 import Dashboard from '@/components/dashboard/page';
 
 interface GroupData {
@@ -20,24 +18,18 @@ interface MemberData {
   isYou?: boolean;
 }
 
-interface DashboardPageProps {
-  params: {
-    groupId: string;
-  };
-}
-
-export default async function DashboardPage({ params }: { params: { groupId: string } }
-) {
-
-
+export default async function DashboardPage({ 
+  params 
+}: { 
+  params: Promise<{ groupId: string }> 
+}) {
+  // Await the params Promise to get the actual parameters
+  const { groupId } = await params;
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
-  // Log URLs for debugging
-  console.log(`Fetching group from: ${API_BASE}/api/groups/${params.groupId}`);
-  console.log(`Fetching members from: ${API_BASE}/api/groups/${params.groupId}/members`);
+  console.log(`Fetching group from: ${API_BASE}/api/groups/${groupId}`);
 
-  // Fetch group data
-  const groupRes = await fetch(`${API_BASE}/api/groups/${params.groupId}`, {
+  const groupRes = await fetch(`${API_BASE}/api/groups/${groupId}`, {
     cache: 'no-store',
   });
 
@@ -48,18 +40,16 @@ export default async function DashboardPage({ params }: { params: { groupId: str
   }
   const group: GroupData = await groupRes.json();
 
-  // Fetch members data
-  const membersRes = await fetch(`${API_BASE}/api/groups/${params.groupId}/members`, {
-    cache: 'no-store',
-  });
+  // const membersRes = await fetch(`${API_BASE}/api/groups/${groupId}/members`, {
+  //   cache: 'no-store',
+  // });
 
-  if (!membersRes.ok) {
-    const errorText = await membersRes.text();
-    console.error('Members fetch failed:', membersRes.status, errorText);
-    throw new Error('Failed to fetch members');
-  }
-  const members: MemberData[] = await membersRes.json();
+  // if (!membersRes.ok) {
+  //   const errorText = await membersRes.text();
+  //   console.error('Members fetch failed:', membersRes.status, errorText);
+  //   throw new Error('Failed to fetch members');
+  // }
+  // const members: MemberData[] = await membersRes.json();
 
-  // Render the dashboard with fetched data
-  return <Dashboard group={group} members={members} />;
+  return <Dashboard group={group} members={[]} />;
 }

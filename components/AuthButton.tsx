@@ -27,8 +27,7 @@ export default function AuthButton() {
     return (
       <button
         onClick={handleLogoutClick}
-        className="rounded-full bg-primary text-primary-foreground px-4 py-2 hover:bg-primary/90 transition font-semibold shadow-md"
-      >
+        className="rounded-full bg-primary text-primary-foreground px-4 py-2 hover:bg-primary/90 transition font-semibold shadow-md">
         Logout
       </button>
     );

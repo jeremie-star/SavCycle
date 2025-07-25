@@ -43,14 +43,7 @@ export default function Dashboard({ group, members }: DashboardProps) {
   // Use passed members from props instead of demo data
   const groupMembers = members.length
     ? members
-    : [
-        { id: '1', name: 'You', status: 'paid', isYou: true },
-        { id: '2', name: 'Claudine', status: 'paid' },
-        { id: '3', name: 'Jean', status: 'pending' },
-        { id: '4', name: 'Marie', status: 'paid' },
-        { id: '5', name: 'Pascal', status: 'pending' },
-        { id: '6', name: 'Diane', status: 'paid' },
-      ];
+    : [];
 
   // Payout order logic state
   const [payoutOrderType, setPayoutOrderType] = useState<'random' | 'fixed' | 'need'>(group.payout_order || 'random');
@@ -229,7 +222,7 @@ export default function Dashboard({ group, members }: DashboardProps) {
                 <div>
                   {/* Replace with real contribution amount */}
                   <p className="text-2xl font-bold">{group.contribution_amount.toLocaleString()} RWF</p>
-                  <p className="text-xs text-muted-foreground">Paid for this week</p>
+                  <p className="text-xs text-muted-foreground">Pay for this turn</p>
                 </div>
                 <Button asChild>
                   <Link href="/payment">{t('dashboard.make')}</Link>
