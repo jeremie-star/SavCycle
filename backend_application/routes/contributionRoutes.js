@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const contributionModel = require("../models/contributionModel");
+const { checkAuth } = require("./userRoutes");
 
 const allowedPaymentMethods = ["mobile-money", "card"];
 const allowedStatuses = ["completed", "incomplete", "pending"];
 
-// Create a new contribution
-router.post("/:group_id", async (req, res) => {
+router.post("/:group_id",checkAuth, async (req, res) => {
   try {
     const {
       amount,
@@ -15,17 +15,18 @@ router.post("/:group_id", async (req, res) => {
       status = 'completed'
     } = req.body;
 
+    const group_id = req.params.group_id;
+    const user_id = req.user?.uid;
+
     // Validate required fields
-    if (!amount) {
-      return res.status(400).json({ error: "amount is required." });
+    if (!amount || !group_id || !user_id) {
+      return res.status(400).json({ error: "Missing required fields (amount, group_id, or user_id)." });
     }
 
-    // Validate payment method
     if (!allowedPaymentMethods.includes(payment_method)) {
       return res.status(400).json({ error: "Invalid payment method. Use 'mobile-money' or 'card'." });
     }
 
-    // Validate status
     if (!allowedStatuses.includes(status)) {
       return res.status(400).json({ error: "Invalid status. Use 'completed', 'incomplete', or 'pending'." });
     }
@@ -41,8 +42,8 @@ router.post("/:group_id", async (req, res) => {
 
     res.status(201).json(contribution);
   } catch (err) {
-    console.error("Error creating contribution:", err);
-    res.status(500).json({ error: "Failed to create contribution" });
+     console.error("Error creating contribution:", err);
+  res.status(500).json({ error: "Database error", details: dbError.message });
   }
 });
 

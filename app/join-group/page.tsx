@@ -52,7 +52,7 @@ export default function JoinGroup() {
 
       setTimeout(() => {
         // Redirect to the group's dashboard
-        router.push(`/dashboard/${data.group_code}`); 
+        router.push(`/dashboard/${data.group_id}`);
       }, 1000);
     } else {
       toast.error(data.error || 'Failed to join group');

@@ -20,7 +20,7 @@ export default function AuthButton() {
   const handleLogoutClick = () => {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
-    router.push("/");
+    router.push("/auth");
   };
 
   if (isLoggedIn) {

@@ -1,5 +1,6 @@
 import Dashboard from '@/components/dashboard/page';
 
+
 interface GroupData {
   id: string;
   name: string;
@@ -29,7 +30,6 @@ export default async function DashboardPage({
   const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
 
   console.log(`Fetching group from: ${API_BASE}/api/groups/${groupId}`);
-
   // Fetch group data
   const groupRes = await fetch(`${API_BASE}/api/groups/${groupId}`, {
     cache: 'no-store',

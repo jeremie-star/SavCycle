@@ -225,7 +225,7 @@ export default function Dashboard({ group, members }: DashboardProps) {
                   <p className="text-xs text-muted-foreground">Pay for this turn</p>
                 </div>
                 <Button asChild>
-                  <Link href="/payment">{t('dashboard.make')}</Link>
+                  <Link href={`/payment?groupId=${group.id}`}>{t('dashboard.make')}</Link>
                 </Button>
               </div>
             </CardContent>
@@ -281,7 +281,7 @@ export default function Dashboard({ group, members }: DashboardProps) {
                           variant={member.status === 'paid' ? 'default' : 'outline'}
                           className="capitalize"
                         >
-                          {member.status === 'paid' ? t('status.completed') : t('status.pending')}
+                          {member.status === 'paid' ? t('status.pending') : t('status.completed')}
                         </Badge>
                       </li>
                     ))}

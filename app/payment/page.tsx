@@ -1,5 +1,6 @@
-"use client";
+'use client';
 
+import React, { Suspense } from 'react';
 import { useLanguage } from '@/contexts/language-context';
 import { Header } from '@/components/header';
 import { MobileNav } from '@/components/nav/mobile-nav';
@@ -11,13 +12,15 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useEffect, useState } from 'react';
 import { CreditCard, Smartphone, AlertCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { useRouter } from 'next/navigation';
-import { useToast } from '@/hooks/use-toast';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 
-export default function Payment() {
+function Payment() {
   const { t } = useLanguage();
   const router = useRouter();
-  const { toast } = useToast();
+  const searchParams = useSearchParams();
+  const groupId = searchParams.get('groupId'); // Extract groupId from URL parameters
+  
   const [paymentMethod, setPaymentMethod] = useState('mobile-money');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [cardDetails, setCardDetails] = useState({
@@ -28,33 +31,45 @@ export default function Payment() {
   });
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
-  const [amount, setAmount] = useState<number>(5000); 
+  const [amount, setAmount] = useState<number>(); 
 
   useEffect(() => {
-  const storedMethod = localStorage.getItem("selected_payment_method");
-  if (storedMethod) {
-    setPaymentMethod(storedMethod);
+    const storedMethod = localStorage.getItem("selected_payment_method");
+    if (storedMethod) {
+      setPaymentMethod(storedMethod);
+    }
+    
+    // Check if groupId exists
+    if (!groupId) {
+      toast.error("No group found. Redirecting to dashboard.");
+      router.push('/dashboard');
+    }
+  }, [groupId, router]);
+
+  function parseJwt(token: string) {
+    try {
+      return JSON.parse(atob(token.split('.')[1]));
+    } catch (e) {
+      return null;
+    }
   }
-}, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!groupId) {
+      toast.error("Group ID is missing");
+      return;
+    }
+    
     // Validate based on payment method
     if (paymentMethod === 'mobile-money' && !phoneNumber) {
-      toast({
-        title: "Error",
-        description: "Please enter your phone number",
-        variant: "destructive"
-      });
+      toast("Please enter your phone number");
       return;
     }
     
     if (paymentMethod === 'card' && (!cardDetails.number || !cardDetails.name || !cardDetails.expiry || !cardDetails.cvv)) {
-      toast({
-        title: "Error",
-        description: "Please fill all card details",
-        variant: "destructive"
-      });
+      toast("Please fill all card details");
       return;
     }
     
@@ -62,58 +77,64 @@ export default function Payment() {
   };
 
   const handleConfirm = async () => {
-  setShowConfirmation(false);
+    setShowConfirmation(false);
 
-  try {
-    toast({
-      title: "Processing payment...",
-      description: "Please wait while we process your contribution."
-    });
-    const user_id = localStorage.getItem('user_id');
-    const group_id = localStorage.getItem('group_id');
-    console.log(`User ID: ${user_id}, Group ID: ${group_id}, Payment Method: ${paymentMethod}`);
-    // Ensure user_id and group_id are available
-    if (!user_id || !group_id) {
-      throw new Error("User or group ID not found");
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error("No token found. Please log in.");
+        return;
+      }
+
+      const payload = parseJwt(token);
+      const user_id = payload?.id || payload?.Id; 
+
+      if (!user_id || !groupId) {
+        toast.error("Missing user or group ID");
+        return;
+      }
+
+      const response = await fetch(`http://localhost:3001/api/contributions/${groupId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`, 
+        },
+        body: JSON.stringify({
+          amount: amount,
+          payment_method: paymentMethod,
+          status: "completed",
+          contribution_date: new Date().toISOString(),
+        })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to process payment");
+      }
+
+      toast.success("Your contribution was successful!");
+      setShowSuccess(true);
+
+    } catch (err: any) {
+      console.error("Payment error:", err);
+      toast.error("Payment failed: " + err.message);
     }
-    const response = await fetch('/api/contributions/${groupId}', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        amount: amount,
-        payment_method: paymentMethod,
-        status: "completed"
-      })
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Failed to process payment");
-    }
-
-    toast({
-      title: "Success",
-      description: "Your contribution was successful!",
-    });
-
-    setShowSuccess(true);
-  } catch (err: any) {
-    toast({
-      title: "Payment failed",
-      description: err.message,
-      variant: "destructive"
-    });
-  }
-};
-
+  };
 
   const handleComplete = () => {
     setShowSuccess(false);
-    router.push('/dashboard');
+    // Navigate back to the specific group dashboard
+    router.push(`/dashboard/${groupId}`);
   };
 
   const handleBack = () => {
-    router.back();
+    // Navigate back to the specific group dashboard
+    if (groupId) {
+      router.push(`/dashboard/${groupId}`);
+    } else {
+      router.back();
+    }
   };
 
   const handleCardInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,6 +144,15 @@ export default function Payment() {
       [name]: value
     }));
   };
+
+  // Show loading or redirect if no groupId
+  if (!groupId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -283,7 +313,7 @@ export default function Payment() {
           <DialogHeader>
             <DialogTitle>Confirm Payment</DialogTitle>
             <DialogDescription>
-              You are about to make a contribution of 5,000 RWF to the Family Savings Group
+              You are about to make a contribution of {amount} RWF to the group
             </DialogDescription>
           </DialogHeader>
           <div className="bg-muted/50 p-3 rounded-md space-y-2">
@@ -332,7 +362,7 @@ export default function Payment() {
               <span>{t('payment.success')}</span>
             </DialogTitle>
             <DialogDescription className="text-center">
-              Your contribution of 5,000 RWF has been successfully processed
+              Your contribution of {amount} RWF has been successfully processed
             </DialogDescription>
           </DialogHeader>
           <div className="bg-muted/50 p-3 rounded-md">
@@ -378,5 +408,13 @@ function CheckCircleIcon(props: React.SVGProps<SVGSVGElement>) {
       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
       <polyline points="22 4 12 14.01 9 11.01" />
     </svg>
+  );
+}
+
+export default function PaymentPageWrapper() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <Payment />
+    </Suspense>
   );
 }
