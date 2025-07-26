@@ -1,5 +1,6 @@
-"use client";
+'use client';
 
+import React, { Suspense } from 'react';
 import { useLanguage } from '@/contexts/language-context';
 import { Header } from '@/components/header';
 import { MobileNav } from '@/components/nav/mobile-nav';
@@ -14,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 
-export default function Payment() {
+function Payment() {
   const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -407,5 +408,13 @@ function CheckCircleIcon(props: React.SVGProps<SVGSVGElement>) {
       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
       <polyline points="22 4 12 14.01 9 11.01" />
     </svg>
+  );
+}
+
+export default function PaymentPageWrapper() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <Payment />
+    </Suspense>
   );
 }
