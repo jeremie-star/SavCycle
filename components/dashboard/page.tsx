@@ -281,7 +281,7 @@ export default function Dashboard({ group, members }: DashboardProps) {
                           variant={member.status === 'paid' ? 'default' : 'outline'}
                           className="capitalize"
                         >
-                          {member.status === 'paid' ? t('status.completed') : t('status.pending')}
+                          {member.status === 'paid' ? t('status.pending') : t('status.completed')}
                         </Badge>
                       </li>
                     ))}

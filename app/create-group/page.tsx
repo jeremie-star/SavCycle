@@ -78,12 +78,13 @@ export default function CreateGroup() {
 
       const data = await res.json();
       console.log('Group created:', data);
-      toast.success('Group created successfully!', {
-      description: (
-        <div className="flex items-center justify-between">
-          <span className="font-medium">Code: {data.group_code}</span>
-          <Button
-            size="sm"
+      toast.success('Group created successfully!',
+        {
+          description: (
+            <div className="flex items-center justify-between">
+              <span className="font-medium">Code: {data.group_code}</span>
+              <Button
+                size="sm"
             variant="outline"
             onClick={() => {
               navigator.clipboard.writeText(data.group_code);
@@ -100,8 +101,8 @@ export default function CreateGroup() {
      const groupId = data.group?.id || data.group?.group_code;
 
   if (groupId) {
-    // Redirect to dashboard
-    router.push(`/dashboard/${groupId}`);
+    // Redirect to join group
+    router.push(`/join-group`);
   }
     } catch (err) {
       console.error('Request failed', err);
