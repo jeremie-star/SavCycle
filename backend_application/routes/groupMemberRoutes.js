@@ -44,7 +44,6 @@ router.get("/my-group", checkAuth, async (req, res) => {
       "SELECT group_id FROM group_members WHERE user_id = $1",
       [userId]
     );
-
     console.log(" DB result:", result.rows);
 
     if (result.rows.length === 0) {
