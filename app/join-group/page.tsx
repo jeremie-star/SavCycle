@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Header } from '@/components/header';
 import { MobileNav } from '@/components/nav/mobile-nav';
@@ -13,11 +13,25 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 export default function JoinGroup() {
   const router = useRouter();
   const [codeInputs, setCodeInputs] = useState(['', '', '', '', '', '']);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleChange = (i: number, val: string) => {
     const updated = [...codeInputs];
     updated[i] = val.toUpperCase();
     setCodeInputs(updated);
+    if (val && i < codeInputs.length - 1) {
+      inputRefs.current[i + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (i: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Allow backspace to move to the previous field
+    if (e.key === 'Backspace' && !codeInputs[i] && i > 0) {
+      const updated = [...codeInputs];
+      updated[i - 1] = '';
+      setCodeInputs(updated);
+      inputRefs.current[i - 1]?.focus();
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -85,10 +99,23 @@ export default function JoinGroup() {
                   {codeInputs.map((val, i) => (
                     <Input
                       key={i}
+                      ref={(el) => {if (el) inputRefs.current[i] = el;}}
                       className="h-12 text-center text-lg"
                       maxLength={1}
                       value={val}
                       onChange={(e) => handleChange(i, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(i, e)}
+                      onPaste={(e) => {
+                           const paste = e.clipboardData.getData('text');
+                           if (paste.length === 6 && /^[a-zA-Z0-9]+$/.test(paste)) {
+                           e.preventDefault();
+                           const chars = paste.toUpperCase().split('');
+                           setCodeInputs(chars);
+                           setTimeout(() => {
+                           inputRefs.current[5]?.focus();
+                            }, 10);
+                               }
+                            }}
                       required
                     />
                   ))}
