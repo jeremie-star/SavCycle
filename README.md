@@ -46,7 +46,7 @@ Frontend (Next.js) ↔️ REST API (Express.js) ↔️ PostgreSQL DB
 | POST   | /api/groups/join       | Join group with code    |
 | GET    | /api/members/my-group  | Fetch group data        |
 | POST   | /api/contributions     | Add user contribution   |
-| POST   | /api/Payouts          | The payout orders       |
+| POST   | /api/Payouts           | The payout orders       |
 
 ## Local Development
 
@@ -70,10 +70,10 @@ npm run dev
 
 ## Documentation
 
-- [Final Project Report](./docs/project_final_report.pdf)
+- [Final Project Report](https://docs.google.com/document/d/16lj6aZ6LEnMOKjw38zsv0uOXmzZniNYPuSaRCjDve84/edit?tab=t.0)
 
 ## Demo
 
-Watch our walkthrough video: [Demo Video Link](https://your-demo-link.com)
+Watch our walkthrough video: [Demo Video Link](https://drive.google.com/file/d/1XTib2Wtlzv41FabLqMty5yB1iulyou8f/view?usp=sharing)
 
 > Built for the Final Project submission | July 2025
