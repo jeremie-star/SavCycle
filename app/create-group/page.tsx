@@ -94,9 +94,22 @@ export default function CreateGroup() {
             <Copy className="h-4 w-4 mr-1" />
             Copy
           </Button>
+          <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => {
+            const subject = encodeURIComponent('Join My Ikimina Group');
+            const body = encodeURIComponent(
+              `Hi,\n\nI just created an Ikimina group. Use this code to join: ${data.group_code}\n\nVisit the app to enter the code.\n\nThanks!`
+            );
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+          }}
+        >
+          Share
+        </Button>
         </div>
       ),
-      duration: 16000,
+      duration: 8000,
     });
      const groupId = data.group?.id || data.group?.group_code;
 
